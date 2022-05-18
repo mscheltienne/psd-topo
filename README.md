@@ -1,10 +1,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-# template-python
+# Real-time PSD topographic display
 
-Template python repository.
+Project for the [FCBG](https://www.campusbiotech.ch/en/) artists in residence,
+where the PSD in the alpha-band is plotted on topographic plots in real-time.
 
-The folder name `template` should be changed to the package name.
-Entries in `setup.py` should be adapted to the path(s)/URL(s)/name(s)/...
-involved in the package.
+Each LSL stream selected is displayed on a separate topographic plot.
