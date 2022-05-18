@@ -4,7 +4,7 @@ from mne import Info
 from numpy.typing import NDArray
 
 from .utils._checks import _check_type
-from .utils._docs import fill_doc
+from .utils._docs import fill_doc, copy_doc
 
 
 @fill_doc
@@ -22,7 +22,7 @@ class TopoMap(ABC):
         self._info = TopoMap.check_info(info)
 
     @abstractmethod
-    def update(self, data: NDArray):
+    def update(self, data: NDArray[float]):
         """
         Update the topographic map with the new data array (n_channels, ).
 
@@ -31,7 +31,6 @@ class TopoMap(ABC):
         data : array
             1D array of shape (n_channels, ) containing the new data samples to
             plot.
-
         """
         pass
 
@@ -64,3 +63,7 @@ class TopoMapMPL(TopoMap):
 
     def __init__(self, info: Info):
         super().__init__(info)
+
+    @copy_doc(TopoMap.update)
+    def update(self, data: NDArray[float]):
+        pass

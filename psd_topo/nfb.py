@@ -9,7 +9,7 @@ from .utils._checks import _check_type
 
 
 def nfb(stream_name: str):
-    """A basic NFB loop that runs 30 seconds.
+    """Neurofeedback loop.
 
     Parameters
     ----------
