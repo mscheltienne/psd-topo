@@ -27,7 +27,9 @@ class _Feedback(ABC):
         self._vmax = None
 
     @abstractmethod
-    def update(self, topodata: NDArray[float], timestamp: float, lineplotdata: float):
+    def update(
+        self, topodata: NDArray[float], timestamp: float, lineplotdata: float
+    ):
         """
         Update the topographic map with the new data array (n_channels, ).
 
@@ -114,11 +116,13 @@ class FeedbackMPL(_Feedback):
             **self._kwargs,
         )
         # prepare axes for line plot
-        self._axes[1].axis('off')
+        self._axes[1].axis("off")
         self._points = []
 
     @copy_doc(_Feedback.update)
-    def update(self, topodata: NDArray[float], timestamp: float, lineplotdata: float):
+    def update(
+        self, topodata: NDArray[float], timestamp: float, lineplotdata: float
+    ):
         self._update_topoplot(topodata)
         self._update_lineplot(timestamp, lineplotdata)
         # redraw figure

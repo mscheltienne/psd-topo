@@ -34,7 +34,7 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
         [k for k, ch in enumerate(ch_names) if ch not in ch2remove]
     )
     # retrieve indices of channels to average for line-plot
-    ch2average = ('O1', 'O2')
+    ch2average = ("O1", "O2")
     ch2average_idx = np.array(
         [k for k, ch in enumerate(ch_names) if ch in ch2average]
     )
