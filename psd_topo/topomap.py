@@ -1,10 +1,14 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
 
+import numpy as np
+from matplotlib import pyplot as plt
 from mne import Info
+from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
 from .utils._checks import _check_type
-from .utils._docs import fill_doc, copy_doc
+from .utils._docs import copy_doc, fill_doc
 
 
 @fill_doc
@@ -45,10 +49,12 @@ class TopoMap(ABC):
     @staticmethod
     def _check_info(info):
         """Static checker for the provided info instance."""
-        _check_type(info, (Info,), 'info')
+        _check_type(info, (Info,), "info")
         if info.get_montage() is None:
-            raise ValueError("The provided info instance 'info' does not have "
-                             "a DigMontage attached.")
+            raise ValueError(
+                "The provided info instance 'info' does not have "
+                "a DigMontage attached."
+            )
 
 
 @fill_doc
@@ -59,11 +65,48 @@ class TopoMapMPL(TopoMap):
     Parameters
     ----------
     %(info)s
+    figsize : tuple
+        2-sequence tuple defining the matplotlib figure size: (width, height)
+        in inches.
     """
 
-    def __init__(self, info: Info):
+    def __init__(self, info: Info, figsize: Tuple[float, float]):
         super().__init__(info)
+        self._f, self._ax = plt.subplots(1, 1, figsize=figsize)
+        # define kwargs for plot_topomap
+        self._kwargs = dict(
+            cmap="Reds",
+            sensors=True,
+            res=64,
+            names=None,
+            outlines="head",
+            contours=6,
+            onselect=None,
+            extrapolate="auto",
+        )
+        # create initial plot
+        plot_topomap(
+            np.zeros(len(self.info["ch_names"])),
+            self._info,
+            axes=self._ax,
+            show=True,
+            **self._kwargs,
+        )
 
     @copy_doc(TopoMap.update)
     def update(self, data: NDArray[float]):
-        pass
+        self._ax.clear()
+        plot_topomap(
+            data, self._info, axes=self._ax, show=True, **self._kwargs
+        )
+        self._f.canvas.draw_idle()
+
+    @property
+    def f(self):
+        """Matplotlib figure."""
+        return self._f
+
+    @property
+    def ax(self):
+        """Matplotlib axes."""
+        return self._ax

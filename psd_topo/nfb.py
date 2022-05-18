@@ -28,8 +28,8 @@ def nfb(stream_name: str):
     ch_names = ch_names[1:]
 
     # create feedback
-    info = create_info(ch_names=ch_names, sfreq=fs, ch_types='eeg')
-    info.set_montage('standard_1020')
+    info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
+    info.set_montage("standard_1020")
     feedback = TopoMapMPL(info)
 
     # wait to fill one buffer

@@ -8,7 +8,9 @@ import sys
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
-docdict['info'] = """
+docdict[
+    "info"
+] = """
 info : Info
     MNE Info instance with a montage."""
 
