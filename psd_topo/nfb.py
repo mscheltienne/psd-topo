@@ -3,14 +3,15 @@ from typing import Tuple
 
 import numpy as np
 from bsl import StreamReceiver
+from matplotlib import pyplot as plt
 from mne import create_info
 
+from .feedback import TopoMap
 from .fft import _fft
-from .topomap import TopoMapMPL
 from .utils._checks import _check_band, _check_type
 
 
-def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(6, 3)):
+def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     """Neurofeedback loop.
 
     Parameters
@@ -18,7 +19,6 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(6, 3)):
     stream_name : str
         The name of the LSL stream to connect to.
     %(band)s
-    %(figsize)s
     """
     _check_type(stream_name, (str,), "stream_name")
     _check_band(band)
@@ -39,7 +39,8 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(6, 3)):
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
     info.set_montage("standard_1020")
-    feedback = TopoMapMPL(info, figsize)
+    fig, axes = plt.subplots(1, 1, figsize=(4, 4))
+    feedback = TopoMap(fig, axes, info)
 
     # wait to fill one buffer
     time.sleep(1)
