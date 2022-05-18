@@ -19,7 +19,7 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
         Sampling frequency in Hz.
     %(band)s
     dB : bool
-        If True, the fftval are conveted to dB with 10 * np.log10(fftval).
+        If True, the fftval are converted to dB with 10 * np.log10(fftval).
 
     Returns
     -------
