@@ -10,7 +10,7 @@ from .topomap import TopoMapMPL
 from .utils._checks import _check_band, _check_type
 
 
-def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
+def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(4, 4)):
     """Neurofeedback loop.
 
     Parameters
@@ -18,6 +18,7 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     stream_name : str
         The name of the LSL stream to connect to.
     %(band)s
+    %(figsize)s
     """
     _check_type(stream_name, (str,), "stream_name")
     _check_band(band)
@@ -38,7 +39,7 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
     info.set_montage("standard_1020")
-    feedback = TopoMapMPL(info)
+    feedback = TopoMapMPL(info, figsize)
 
     # wait to fill one buffer
     time.sleep(1)

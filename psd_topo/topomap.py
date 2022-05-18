@@ -66,12 +66,10 @@ class TopoMapMPL(TopoMap):
     Parameters
     ----------
     %(info)s
-    figsize : tuple
-        2-sequence tuple defining the matplotlib figure size: (width, height)
-        in inches.
+    %(figsize)s
     """
 
-    def __init__(self, info: Info, figsize: Tuple[float, float] = (5, 5)):
+    def __init__(self, info: Info, figsize: Tuple[float, float] = (4, 4)):
         super().__init__(info)
         self._f, self._ax = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap

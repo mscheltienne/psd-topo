@@ -8,11 +8,18 @@ import sys
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
+# ----------------------------- Topographic plots ----------------------------
 docdict[
     "info"
 ] = """
 info : Info
     MNE Info instance with a montage."""
+docdict["figsize"] = """
+figsize : tuple
+    2-sequence tuple defining the matplotlib figure size: (width, height)
+    in inches."""
+
+# ------------------------------------ FFT -----------------------------------
 docdict[
     "band"
 ] = """

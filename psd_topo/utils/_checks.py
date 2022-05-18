@@ -213,7 +213,7 @@ def _check_band(band):
         )
     for elt in band:
         _check_type(elt, ("numeric",), "band")
-        if 0 <= elt:
+        if elt <= 0:
             raise ValueError(
                 "The frequency boundaries of the frequency band "
                 "of interest 'band' must be strictly positive."
