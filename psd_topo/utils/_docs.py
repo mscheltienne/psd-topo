@@ -13,7 +13,9 @@ docdict[
 ] = """
 info : Info
     MNE Info instance with a montage."""
-docdict["band"] = """
+docdict[
+    "band"
+] = """
 band : tuple
     Frequency band of interest in Hz as 2 floats, e.g. (8, 13) (edge inc.)."""
 

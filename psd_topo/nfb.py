@@ -7,7 +7,7 @@ from mne import create_info
 
 from .fft import _fft
 from .topomap import TopoMapMPL
-from .utils._checks import _check_type, _check_band
+from .utils._checks import _check_band, _check_type
 
 
 def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
@@ -29,8 +29,10 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     fs = sr.streams[stream_name].sample_rate
     ch_names = sr.streams[stream_name].ch_list
     # remove unwanted channels
-    ch2remove = ('TRIGGER', 'TRG', 'X1', 'X2', 'X3', 'A1', 'A2')
-    ch_idx = np.array([k for k, ch in enumerate(ch_names) if ch not in ch2remove])
+    ch2remove = ("TRIGGER", "TRG", "X1", "X2", "X3", "A1", "A2")
+    ch_idx = np.array(
+        [k for k, ch in enumerate(ch_names) if ch not in ch2remove]
+    )
     ch_names = [ch for ch in ch_names if ch not in ch2remove]
 
     # create feedback

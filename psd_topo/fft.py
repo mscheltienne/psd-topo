@@ -3,7 +3,7 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from .utils._checks import _check_type, _check_band
+from .utils._checks import _check_band, _check_type
 from .utils._docs import copy_doc, fill_doc
 
 
