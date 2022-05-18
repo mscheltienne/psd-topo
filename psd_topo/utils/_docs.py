@@ -8,6 +8,10 @@ import sys
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
+docdict['info'] = """
+info : Info
+    MNE Info instance with a montage."""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
 

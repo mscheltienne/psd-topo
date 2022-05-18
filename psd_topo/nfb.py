@@ -1,6 +1,7 @@
 import time
 
 from bsl import StreamReceiver
+from mne import create_info
 
 from . import TopoMapMPL
 from .fft import _fft
@@ -20,8 +21,16 @@ def nfb(stream_name: str):
     # create receiver and feedback
     sr = StreamReceiver(bufsize=1, winsize=1, stream_name=stream_name)
 
-    # retrieve sampling rate
+    # retrieve sampling rate and channels
     fs = sr.streams[stream_name].sample_rate
+    ch_names = sr.streams[stream_name].ch_list
+    # remove unwanted channels: TRIGGER
+    ch_names = ch_names[1:]
+
+    # create feedback
+    info = create_info(ch_names=ch_names, sfreq=fs, ch_types='eeg')
+    info.set_montage('standard_1020')
+    feedback = TopoMapMPL(info)
 
     # wait to fill one buffer
     time.sleep(1)
@@ -36,3 +45,4 @@ def nfb(stream_name: str):
         # compute metric
         metric = _fft(data.T, fs=fs, band=(8, 13), dB=True)  # (n_channels, )
         # update feedback
+        feedback.update(metric)
