@@ -22,6 +22,9 @@ class _Feedback(ABC):
     @abstractmethod
     def __init__(self, info):
         self._info = _Feedback._check_info(info)
+        # define colorbar range
+        self._vmin = None
+        self._vmax = None
 
     @abstractmethod
     def update(self, data: NDArray[float]):
@@ -44,6 +47,16 @@ class _Feedback(ABC):
         :type: `mne.Info`
         """
         return self._info
+
+    @property
+    def vmin(self):
+        """Minimum value of the colormap range."""
+        return self._vmin
+
+    @property
+    def vmax(self):
+        """Maximum value of the colormap range."""
+        return self._vmax
 
     # ------------------------------------------------------------------------
     @staticmethod
@@ -75,8 +88,8 @@ class FeedbackMPL(_Feedback):
         self._fig, self._axes = plt.subplots(1, 1, figsize=(4, 4))
         # define kwargs for plot_topomap
         self._kwargs = dict(
-            vmin=None,
-            vmax=None,
+            vmin=self._vmin,
+            vmax=self._vmax,
             cmap="RdBu_r",
             sensors=True,
             res=64,
