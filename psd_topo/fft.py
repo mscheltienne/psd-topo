@@ -3,8 +3,8 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from ..utils._checks import _check_type
-from ..utils._docs import copy_doc
+from .utils._checks import _check_type
+from .utils._docs import copy_doc
 
 
 def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):

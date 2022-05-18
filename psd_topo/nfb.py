@@ -3,8 +3,8 @@ import time
 from bsl import StreamReceiver
 from mne import create_info
 
-from . import TopoMapMPL
 from .fft import _fft
+from .topomap import TopoMapMPL
 from .utils._checks import _check_type
 
 
