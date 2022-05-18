@@ -1,22 +1,26 @@
 import time
+from typing import Tuple
 
+import numpy as np
 from bsl import StreamReceiver
 from mne import create_info
 
 from .fft import _fft
 from .topomap import TopoMapMPL
-from .utils._checks import _check_type
+from .utils._checks import _check_type, _check_band
 
 
-def nfb(stream_name: str):
+def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     """Neurofeedback loop.
 
     Parameters
     ----------
     stream_name : str
         The name of the LSL stream to connect to.
+    %(band)s
     """
     _check_type(stream_name, (str,), "stream_name")
+    _check_band(band)
 
     # create receiver and feedback
     sr = StreamReceiver(bufsize=1, winsize=1, stream_name=stream_name)
@@ -24,8 +28,10 @@ def nfb(stream_name: str):
     # retrieve sampling rate and channels
     fs = sr.streams[stream_name].sample_rate
     ch_names = sr.streams[stream_name].ch_list
-    # remove unwanted channels: TRIGGER
-    ch_names = ch_names[1:]
+    # remove unwanted channels
+    ch2remove = ('TRIGGER', 'TRG', 'X1', 'X2', 'X3', 'A1', 'A2')
+    ch_idx = np.array([k for k, ch in enumerate(ch_names) if ch not in ch2remove])
+    ch_names = [ch for ch in ch_names if ch not in ch2remove]
 
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
@@ -36,13 +42,14 @@ def nfb(stream_name: str):
     time.sleep(1)
 
     # loop for 30 seconds
-    while True:
+    start = time.time()
+    while time.time() - start <= 30:
         # retrieve data
         sr.acquire()
         data, _ = sr.get_window()
         # remove trigger channel
-        data = data[:, 1:]
+        data = data[:, ch_idx]
         # compute metric
-        metric = _fft(data.T, fs=fs, band=(8, 13), dB=True)  # (n_channels, )
+        metric = _fft(data.T, fs=fs, band=band, dB=True)  # (n_channels, )
         # update feedback
         feedback.update(metric)

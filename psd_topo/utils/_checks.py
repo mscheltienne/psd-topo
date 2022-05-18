@@ -199,3 +199,30 @@ def _check_verbose(verbose):
             verbose = "WARNING"
 
     return verbose
+
+
+def _check_band(band):
+    """Check that the frequency band of interest is valid."""
+    _check_type(band, (tuple, list), "band")
+    if not isinstance(band, tuple):
+        band = tuple(band)
+    if len(band) != 2:
+        raise ValueError(
+            "The frequency band of interest 'band' must be "
+            "defined with 2 numbers: (low, high) Hz."
+        )
+    for elt in band:
+        _check_type(elt, ("numeric",), "band")
+        if 0 <= elt:
+            raise ValueError(
+                "The frequency boundaries of the frequency band "
+                "of interest 'band' must be strictly positive."
+            )
+    if band[1] <= band[0]:
+        raise ValueError(
+            "The frequency boundaries of the frequency band of "
+            "interest 'band' must be in the order (low, high) "
+            "respecting low < high."
+        )
+
+    return band

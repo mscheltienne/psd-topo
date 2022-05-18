@@ -3,10 +3,11 @@ from typing import Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from .utils._checks import _check_type
-from .utils._docs import copy_doc
+from .utils._checks import _check_type, _check_band
+from .utils._docs import copy_doc, fill_doc
 
 
+@fill_doc
 def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
     """Apply FFT to the data after applying a hamming window.
 
@@ -16,8 +17,7 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
         2D array of shape (n_channels, n_times) containing the received data.
     fs : float
         Sampling frequency in Hz.
-    band : tuple
-        Frequency band of interest in Hz as 2 floats, e.g. (8, 13) (edge inc.).
+    %(band)s
     dB : bool
         If True, the fftval are conveted to dB with 10 * np.log10(fftval).
 
@@ -38,27 +38,7 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
         raise ValueError(
             "The sampling frequency 'fs' must be strictly positive."
         )
-    _check_type(band, (tuple, list), "band")
-    if not isinstance(band, tuple):
-        band = tuple(band)
-    if len(band) != 2:
-        raise ValueError(
-            "The frequency band of interest 'band' must be "
-            "defined with 2 numbers: (low, high) Hz."
-        )
-    for elt in band:
-        _check_type(elt, ("numeric",), "band")
-        if 0 <= elt:
-            raise ValueError(
-                "The frequency boundaries of the frequency band "
-                "of interest 'band' must be strictly positive."
-            )
-    if band[1] <= band[0]:
-        raise ValueError(
-            "The frequency boundaries of the frequency band of "
-            "interest 'band' must be in the order (low, high) "
-            "respecting low < high."
-        )
+    _check_band(band)
     _check_type(dB, (bool,), "dB")
     return _fft(data, fs, band, dB)
 

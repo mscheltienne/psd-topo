@@ -71,12 +71,12 @@ class TopoMapMPL(TopoMap):
         in inches.
     """
 
-    def __init__(self, info: Info, figsize: Tuple[float, float] = (10, 10)):
+    def __init__(self, info: Info, figsize: Tuple[float, float] = (5, 5)):
         super().__init__(info)
         self._f, self._ax = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap
         self._kwargs = dict(
-            cmap="Reds",
+            cmap="RdBu_r",
             sensors=True,
             res=64,
             names=None,
