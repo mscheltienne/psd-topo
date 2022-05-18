@@ -14,10 +14,13 @@ docdict[
 ] = """
 info : Info
     MNE Info instance with a montage."""
-docdict["figsize"] = """
+docdict[
+    "figsize"
+] = """
 figsize : tuple
     2-sequence tuple defining the matplotlib figure size: (width, height)
-    in inches."""
+    in inches. Larger figure will be longer to draw and will slow down the
+    online loop."""
 
 # ------------------------------------ FFT -----------------------------------
 docdict[
