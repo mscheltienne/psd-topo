@@ -8,6 +8,13 @@ import sys
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
 
+# --------------------------------- Feedback ---------------------------------
+docdict[
+    "info"
+] = """
+info : Info
+    MNE Info instance with a montage."""
+
 # ------------------------------------ FFT -----------------------------------
 docdict[
     "band"
