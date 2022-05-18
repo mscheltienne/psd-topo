@@ -84,6 +84,8 @@ class FeedbackMPL(_Feedback):
         self,
         info: Info,
     ):
+        if not plt.isinteractive():
+            plt.ion()  # enable interactive mode
         super().__init__(info)
         self._fig, self._axes = plt.subplots(1, 1, figsize=(4, 4))
         # define kwargs for plot_topomap
