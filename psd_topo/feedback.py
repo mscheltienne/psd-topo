@@ -60,7 +60,7 @@ class _Feedback(ABC):
 
 class FeedbackMPL(_Feedback):
     """
-    Topographic map feedback using matplotlib.
+    Feedback window using matplotlib.
 
     Parameters
     ----------
@@ -104,11 +104,11 @@ class FeedbackMPL(_Feedback):
 
     # ------------------------------------------------------------------------
     @property
-    def fig(self):
+    def fig(self) -> plt.Figure:
         """Matplotlib figure."""
         return self._fig
 
     @property
-    def axes(self):
+    def axes(self) -> plt.Axes:
         """Matplotlib axes."""
         return self._axes
