@@ -33,6 +33,12 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     ch_idx = np.array(
         [k for k, ch in enumerate(ch_names) if ch not in ch2remove]
     )
+    # retrieve indices of channels to average for line-plot
+    ch2average = ('O1', 'O2')
+    ch2average_idx = np.array(
+        [k for k, ch in enumerate(ch_names) if ch in ch2average]
+    )
+    # filter channel name list
     ch_names = [ch for ch in ch_names if ch not in ch2remove]
 
     # create feedback
@@ -43,15 +49,16 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     # wait to fill one buffer
     time.sleep(1)
 
-    # loop for 30 seconds
+    # loop for 10 seconds
     start = time.time()
-    while time.time() - start <= 30:
+    while time.time() - start <= 10:
         # retrieve data
         sr.acquire()
-        data, _ = sr.get_window()
+        data, tslist = sr.get_window()
         # remove trigger channel
         data = data[:, ch_idx]
         # compute metric
-        metric = _fft(data.T, fs=fs, band=band, dB=True)  # (n_channels, )
+        fftval = _fft(data.T, fs=fs, band=band, dB=True)  # (n_channels, )
+        avg = np.average(fftval[ch2average_idx])  # float
         # update feedback
-        feedback.update(metric)
+        feedback.update(fftval, tslist[0], avg)
