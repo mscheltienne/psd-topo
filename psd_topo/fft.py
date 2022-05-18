@@ -27,30 +27,39 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
         1D array of shape (n_channels, ) containing the absolute value of the
         FFT for all channels averaged across the frequency band.
     """
-    _check_type(data, (np.ndarray,), 'data')
+    _check_type(data, (np.ndarray,), "data")
     if data.ndim != 2:
-        raise ValueError("The data array 'data' must be a 2D array of shape "
-                         "(n_channels, n_times).")
-    _check_type(fs, ('numeric',), 'fs')
+        raise ValueError(
+            "The data array 'data' must be a 2D array of shape "
+            "(n_channels, n_times)."
+        )
+    _check_type(fs, ("numeric",), "fs")
     if 0 <= fs:
         raise ValueError(
-            "The sampling frequency 'fs' must be strictly positive.")
-    _check_type(band, (tuple, list), 'band')
+            "The sampling frequency 'fs' must be strictly positive."
+        )
+    _check_type(band, (tuple, list), "band")
     if not isinstance(band, tuple):
         band = tuple(band)
     if len(band) != 2:
-        raise ValueError("The frequency band of interest 'band' must be "
-                         "defined with 2 numbers: (low, high) Hz.")
+        raise ValueError(
+            "The frequency band of interest 'band' must be "
+            "defined with 2 numbers: (low, high) Hz."
+        )
     for elt in band:
-        _check_type(elt, ('numeric',), 'band')
+        _check_type(elt, ("numeric",), "band")
         if 0 <= elt:
-            raise ValueError("The frequency boundaries of the frequency band "
-                             "of interest 'band' must be strictly positive.")
+            raise ValueError(
+                "The frequency boundaries of the frequency band "
+                "of interest 'band' must be strictly positive."
+            )
     if band[1] <= band[0]:
-        raise ValueError("The frequency boundaries of the frequency band of "
-                         "interest 'band' must be in the order (low, high) "
-                         "respecting low < high.")
-    _check_type(dB, (bool,), 'dB')
+        raise ValueError(
+            "The frequency boundaries of the frequency band of "
+            "interest 'band' must be in the order (low, high) "
+            "respecting low < high."
+        )
+    _check_type(dB, (bool,), "dB")
     return _fft(data, fs, band, dB)
 
 

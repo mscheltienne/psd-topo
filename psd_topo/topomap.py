@@ -31,4 +31,5 @@ class TopoMapMPL(TopoMap):
     """
     Topographic map feedback using matplotlib.
     """
+
     pass
