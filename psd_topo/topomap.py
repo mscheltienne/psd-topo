@@ -23,7 +23,7 @@ class TopoMap(ABC):
 
     @abstractmethod
     def __init__(self, info: Info):
-        self._info = TopoMap.check_info(info)
+        self._info = TopoMap._check_info(info)
 
     @abstractmethod
     def update(self, data: NDArray[float]):
@@ -55,6 +55,7 @@ class TopoMap(ABC):
                 "The provided info instance 'info' does not have "
                 "a DigMontage attached."
             )
+        return info
 
 
 @fill_doc
@@ -70,7 +71,7 @@ class TopoMapMPL(TopoMap):
         in inches.
     """
 
-    def __init__(self, info: Info, figsize: Tuple[float, float]):
+    def __init__(self, info: Info, figsize: Tuple[float, float] = (10, 10)):
         super().__init__(info)
         self._f, self._ax = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap
@@ -86,7 +87,7 @@ class TopoMapMPL(TopoMap):
         )
         # create initial plot
         plot_topomap(
-            np.zeros(len(self.info["ch_names"])),
+            np.zeros(len(self._info["ch_names"])),
             self._info,
             axes=self._ax,
             show=True,
@@ -99,7 +100,8 @@ class TopoMapMPL(TopoMap):
         plot_topomap(
             data, self._info, axes=self._ax, show=True, **self._kwargs
         )
-        self._f.canvas.draw_idle()
+        self._f.canvas.draw()
+        self._f.canvas.flush_events()
 
     @property
     def f(self):
