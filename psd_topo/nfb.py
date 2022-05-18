@@ -10,7 +10,7 @@ from .topomap import TopoMapMPL
 from .utils._checks import _check_band, _check_type
 
 
-def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(4, 4)):
+def nfb(stream_name: str, band: Tuple[float, float] = (8, 13), figsize=(6, 3)):
     """Neurofeedback loop.
 
     Parameters

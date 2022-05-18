@@ -69,9 +69,10 @@ class TopoMapMPL(TopoMap):
     %(figsize)s
     """
 
-    def __init__(self, info: Info, figsize: Tuple[float, float] = (4, 4)):
+    def __init__(self, info: Info, figsize: Tuple[float, float] = (6, 3),
+                 winsize: float = 30):
         super().__init__(info)
-        self._f, self._ax = plt.subplots(1, 1, figsize=figsize)
+        self._f, self._ax = plt.subplots(1, 2, figsize=figsize)
         # define kwargs for plot_topomap
         self._kwargs = dict(
             cmap="RdBu_r",
@@ -83,20 +84,24 @@ class TopoMapMPL(TopoMap):
             onselect=None,
             extrapolate="auto",
         )
-        # create initial plot
+        # create initial topographic plot
         plot_topomap(
             np.zeros(len(self._info["ch_names"])),
             self._info,
-            axes=self._ax,
+            axes=self._ax[0],
             show=True,
             **self._kwargs,
         )
 
+        # prepare lineplot axes
+        self._ax[1].axis('off')
+        self._line = None
+
     @copy_doc(TopoMap.update)
     def update(self, data: NDArray[float]):
-        self._ax.clear()
+        self._ax[0].clear()
         plot_topomap(
-            data, self._info, axes=self._ax, show=True, **self._kwargs
+            data, self._info, axes=self._ax[0], show=True, **self._kwargs
         )
         self._f.canvas.draw()
         self._f.canvas.flush_events()
