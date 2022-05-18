@@ -23,7 +23,7 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
 
     Returns
     -------
-    metric : array
+    fftval : array
         1D array of shape (n_channels, ) containing the absolute value of the
         FFT for all channels averaged across the frequency band.
     """
