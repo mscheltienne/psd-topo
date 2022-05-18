@@ -69,8 +69,11 @@ class TopoMapMPL(TopoMap):
     %(figsize)s
     """
 
-    def __init__(self, info: Info, figsize: Tuple[float, float] = (6, 3),
-                 winsize: float = 30):
+    def __init__(
+        self,
+        info: Info,
+        figsize: Tuple[float, float] = (6, 3),
+    ):
         super().__init__(info)
         self._f, self._ax = plt.subplots(1, 2, figsize=figsize)
         # define kwargs for plot_topomap
@@ -94,7 +97,7 @@ class TopoMapMPL(TopoMap):
         )
 
         # prepare lineplot axes
-        self._ax[1].axis('off')
+        self._ax[1].axis("off")
         self._line = None
 
     @copy_doc(TopoMap.update)
