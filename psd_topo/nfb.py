@@ -49,9 +49,8 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     # wait to fill one buffer
     time.sleep(1)
 
-    # loop for 10 seconds
-    start = time.time()
-    while time.time() - start <= 10:
+    # main loop
+    while True:
         # retrieve data
         sr.acquire()
         data, tslist = sr.get_window()
