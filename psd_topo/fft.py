@@ -53,6 +53,7 @@ def _fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
     frequencies = np.fft.rfftfreq(winsize, 1 / fs)
     band_idx = np.where((band[0] <= frequencies) & (frequencies <= band[1]))[0]
     fftval = np.abs(np.fft.rfft(data, axis=-1)[:, band_idx])
+    fftval = np.power(fftval, 2)
     fftval = np.average(fftval, axis=1)
     fftval = 10 * np.log10(fftval) if dB else fftval
     return fftval
