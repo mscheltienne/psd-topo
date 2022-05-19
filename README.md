@@ -6,4 +6,5 @@
 Project for the [FCBG](https://www.campusbiotech.ch/en/) artists in residence,
 where the PSD in the alpha-band is plotted on topographic plots in real-time.
 
-Each LSL stream selected is displayed on a separate topographic plot.
+This package is designed for [DSI-24](https://wearablesensing.com/products/dsi-24/)
+devices from [Wearable Sensing](https://wearablesensing.com/).
