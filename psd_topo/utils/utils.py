@@ -20,8 +20,10 @@ def search_amplifiers(n: int) -> List[str]:
     """
     _check_type(n, ("int",), "n")
     if n <= 0:
-        raise ValueError("The number of amplifiers to look for 'n' must be a "
-                         "strictly positive integer.")
+        raise ValueError(
+            "The number of amplifiers to look for 'n' must be a "
+            "strictly positive integer."
+        )
 
     stream_names, _ = list_lsl_streams(ignore_markers=True)
     return stream_names

@@ -1,6 +1,6 @@
 import argparse
-import time
 import multiprocessing as mp
+import time
 
 from psd_topo import nfb
 from psd_topo.utils import search_amplifiers
@@ -23,14 +23,14 @@ def run():
         type=float,
         metavar="float",
         help="minimum frequency of interest (Hz)",
-        default=8.,
+        default=8.0,
     )
     parser.add_argument(
         "-fmax",
         type=float,
         metavar="float",
         help="maximum frequency of interest (Hz)",
-        default=13.,
+        default=13.0,
     )
     args = parser.parse_args()
 
@@ -40,12 +40,14 @@ def run():
     # start individual processes
     processes = list()
     for stream_name in stream_names:
-        process = mp.Process(target=nfb, args=(stream_name, (args.fmin, args.fmax)))
+        process = mp.Process(
+            target=nfb, args=(stream_name, (args.fmin, args.fmax))
+        )
         process.start()
         processes.append(process)
 
     time.sleep(5)  # give time to the process to start
     # stop
-    input('>> Press ENTER to stop.\n')
+    input(">> Press ENTER to stop.\n")
     for process in processes:
         process.kill()
