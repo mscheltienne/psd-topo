@@ -101,7 +101,7 @@ class FeedbackMPL(_Feedback):
         self._kwargs = dict(
             vmin=self._vmin,
             vmax=self._vmax,
-            cmap="hsv",
+            cmap="rainbow",
             sensors=True,
             res=64,
             axes=self._axes[0],
