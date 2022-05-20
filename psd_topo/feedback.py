@@ -43,7 +43,8 @@ class _Feedback(ABC):
         lineplotdata : float
             Y-value plotted on a lineplot at X=timestamp.
         """
-        pass
+        topodata -= np.mean(topodata)
+        return topodata
 
     # ------------------------------------------------------------------------
     @property
@@ -100,7 +101,7 @@ class FeedbackMPL(_Feedback):
         self._kwargs = dict(
             vmin=self._vmin,
             vmax=self._vmax,
-            cmap="RdBu_r",
+            cmap="hsv",
             sensors=True,
             res=64,
             axes=self._axes[0],
@@ -125,6 +126,7 @@ class FeedbackMPL(_Feedback):
     def update(
         self, topodata: NDArray[float], timestamp: float, lineplotdata: float
     ):
+        topodata = super().update(topodata, timestamp, lineplotdata)
         self._update_topoplot(topodata)
         self._update_lineplot(timestamp, lineplotdata)
         # redraw figure
@@ -141,7 +143,9 @@ class FeedbackMPL(_Feedback):
         if 20 < len(self._points):
             self._points[0].remove()
             del self._points[0]
-        self._points.append(self._axes[1].scatter(timestamp, lineplotdata))
+        self._points.append(
+            self._axes[1].scatter(timestamp, lineplotdata, c="black")
+        )
         if 1 < len(self._points):  # update x-range
             x0 = self._points[0].get_offsets().data[0][0]
             xf = self._points[-1].get_offsets().data[0][0]
