@@ -8,6 +8,7 @@ from numpy.typing import NDArray
 
 from .utils._checks import _check_type
 from .utils._docs import copy_doc, fill_doc
+from .utils._logs import logger
 
 
 @fill_doc
@@ -25,6 +26,9 @@ class _Feedback(ABC):
         # define colorbar range
         self._vmin = None
         self._vmax = None
+        self._inc = 0
+        self._vmin_arr = np.zeros(100)
+        self._vmax_arr = np.zeros(100)
 
     @abstractmethod
     def update(
@@ -44,6 +48,16 @@ class _Feedback(ABC):
             Y-value plotted on a lineplot at X=timestamp.
         """
         topodata -= np.mean(topodata)
+        # update arrays that stores 100 points for vmin/vmax
+        self._vmin_arr[self._inc % 100] = np.min(topodata)
+        self._vmax_arr[self._inc % 100] = np.max(topodata)
+        self._inc += 1
+        # log when 100 points have passed
+        if self._inc == 100:
+            logger.info("System calibrated!")
+        # update vmin/vmax
+        self._vmin = np.percentile(self._vmin_arr, 10)
+        self._vmax = np.percentile(self._vmax_arr, 90)
         return topodata
 
     # ------------------------------------------------------------------------
