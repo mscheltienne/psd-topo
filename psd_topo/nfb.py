@@ -23,7 +23,7 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     _check_band(band)
 
     # create receiver and feedback
-    sr = StreamReceiver(bufsize=1, winsize=1, stream_name=stream_name)
+    sr = StreamReceiver(bufsize=5, winsize=5, stream_name=stream_name)
 
     # retrieve sampling rate and channels
     fs = sr.streams[stream_name].sample_rate

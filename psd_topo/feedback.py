@@ -99,8 +99,8 @@ class FeedbackMPL(_Feedback):
         self,
         info: Info,
     ):
-        if plt.get_backend() != "Qt5Agg":
-            plt.switch_backend("Qt5Agg")
+        if plt.get_backend() != "QtAgg":
+            plt.switch_backend("QtAgg")
         if not plt.isinteractive():
             plt.ion()  # enable interactive mode
         super().__init__(info)
