@@ -26,4 +26,12 @@ def search_amplifiers(n: int) -> List[str]:
         )
 
     stream_names, _ = list_lsl_streams(ignore_markers=True)
+    stream_names = [
+        stream for stream in stream_names if stream.startswith("WS-")
+    ]
+    if len(stream_names) != n:
+        raise RuntimeError(
+            f"{len(stream_names)} streams found starting with "
+            f"'WS-' while {n} streams were expected."
+        )
     return stream_names
