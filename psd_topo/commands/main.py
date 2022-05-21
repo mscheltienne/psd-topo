@@ -1,8 +1,7 @@
 import argparse
 import multiprocessing as mp
-import time
 
-from psd_topo import nfb
+from psd_topo import nfb, set_log_level
 from psd_topo.utils import search_amplifiers
 
 
@@ -19,35 +18,65 @@ def run():
         default=1,
     )
     parser.add_argument(
-        "-fmin",
+        "--fmin",
         type=float,
         metavar="float",
         help="minimum frequency of interest (Hz)",
         default=8.0,
     )
     parser.add_argument(
-        "-fmax",
+        "--fmax",
         type=float,
         metavar="float",
         help="maximum frequency of interest (Hz)",
         default=13.0,
     )
+    parser.add_argument(
+        "--winsize",
+        type=float,
+        metavar="float",
+        help="acquisition window duration (seconds)",
+        default=5.0,
+    )
+    parser.add_argument(
+        "--figsize",
+        type=float,
+        metavar="float",
+        nargs=2,
+        help="figure size for the matplotlib backend",
+    )
+    parser.add_argument(
+        "--verbosity", help="enable debug logs", action="store_true"
+    )
     args = parser.parse_args()
 
-    # look for EEG amplifier
-    stream_names = search_amplifiers(args.n)
+    # set verbosity
+    if args.verbosity:
+        set_log_level("DEBUG")
+        verbose = "DEBUG"
+    else:
+        set_log_level("INFO")
+        verbose = "INFO"
 
     # start individual processes
+    print("\n>> Press ENTER to stop.\n")
+    stream_names = search_amplifiers(args.n)
     processes = list()
     for stream_name in stream_names:
         process = mp.Process(
-            target=nfb, args=(stream_name, (args.fmin, args.fmax))
+            target=nfb,
+            args=(
+                stream_name,
+                (args.fmin, args.fmax),
+                args.winsize,
+                args.figsize,
+                verbose,
+            ),
         )
         process.start()
         processes.append(process)
 
-    time.sleep(5)  # give time to the process to start
     # stop
-    input(">> Press ENTER to stop.\n")
+    input()
     for process in processes:
         process.kill()

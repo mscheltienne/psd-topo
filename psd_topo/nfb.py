@@ -1,5 +1,5 @@
 import time
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from bsl import StreamReceiver
@@ -8,14 +8,15 @@ from mne import create_info
 from .fft import _fft
 from .topomap import TopomapMPL
 from .utils._checks import _check_band, _check_type
-from .utils._logs import logger
+from .utils._logs import logger, set_log_level
 
 
 def nfb(
     stream_name: str,
-    band: Tuple[float, float] = (8, 13),
-    winsize: float = 5.0,
-    figsize: Tuple[float, float] = (3, 3),
+    band: Tuple[float, float],
+    winsize: float,
+    figsize: Optional[Tuple[float, float]] = None,
+    verbose: Optional[Union[str, int]] = None,
 ):
     """Neurofeedback loop.
 
@@ -27,12 +28,16 @@ def nfb(
     winsize : float
         Duration of the acquisition window in seconds.
     %(figsize)s
+    verbose : int | str | None
+        Verbose level. None corresponds to the 'INFO' level.
     """
+    set_log_level(verbose)
     _check_type(stream_name, (str,), "stream_name")
     _check_band(band)
     _check_type(winsize, ("numeric",), "winsize")
     if winsize <= 0:
         raise ValueError("The window size must be a strictly positive number.")
+    figsize = TopomapMPL._check_figsize(figsize)
 
     # create receiver and feedback
     sr = StreamReceiver(

@@ -49,10 +49,11 @@ class _Topomap(ABC):
         self._inc += 1
         # log when 100 points have passed
         if self._inc == 100:
-            logger.info("System calibrated!")
+            logger.info("Vmin/Vmax calibrated!")
         # update vmin/vmax
         self._vmin = np.percentile(self._vmin_arr, 10)
         self._vmax = np.percentile(self._vmax_arr, 90)
+        logger.debug("Vmin: %.3f -- Vmax: %.3f", self._vmin, self._vmax)
         return topodata
 
     # ------------------------------------------------------------------------
@@ -120,12 +121,12 @@ class TopomapMPL(_Topomap):
             vmin=self._vmin,
             vmax=self._vmax,
             cmap="rainbow",
-            sensors=True,
+            sensors=False,
             res=64,
             axes=self._axes,
             names=None,
             outlines="head",
-            contours=6,
+            contours=0,
             onselect=None,
             extrapolate="auto",
             show=False,
@@ -160,3 +161,36 @@ class TopomapMPL(_Topomap):
     def axes(self) -> plt.Axes:
         """Matplotlib axes."""
         return self._axes
+
+    # ------------------------------------------------------------------------
+    @staticmethod
+    def _check_figsize(figsize):
+        """Check the figure size."""
+        figsize = (3, 3) if figsize is None else figsize
+        _check_type(figsize, (tuple, list), "figsize")
+        if len(figsize) != 2:
+            raise ValueError(
+                "The figure size should be a 2-item tuple "
+                "defining the matplotlib figure size (width, "
+                "height) in inches."
+            )
+        for elt in figsize:
+            _check_type(elt, ("numeric",))
+        if any(elt <= 0 for elt in figsize):
+            raise ValueError(
+                "The figure size should be a 2-item tuple of "
+                "strictly positive numbers."
+            )
+        if figsize[0] != figsize[1]:
+            logger.warning(
+                "Topographic maps are best displayed in a square "
+                "axes, define with a figsize (width, height) with "
+                "width = height."
+            )
+        if any(5 < elt for elt in figsize):
+            logger.warning(
+                "Large figsize will increase the render time and "
+                "slow down the online loop, which can create "
+                "stuttering."
+            )
+        return figsize
