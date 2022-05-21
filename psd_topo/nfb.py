@@ -8,10 +8,14 @@ from mne import create_info
 from .fft import _fft
 from .topomap import TopomapMPL
 from .utils._checks import _check_band, _check_type
+from .utils._logs import logger
 
 
 def nfb(
-    stream_name: str, band: Tuple[float, float] = (8, 13), winsize: float = 5.0
+    stream_name: str,
+    band: Tuple[float, float] = (8, 13),
+    winsize: float = 5.0,
+    figsize: Tuple[float, float] = (3, 3),
 ):
     """Neurofeedback loop.
 
@@ -22,6 +26,7 @@ def nfb(
     %(band)s
     winsize : float
         Duration of the acquisition window in seconds.
+    %(figsize)s
     """
     _check_type(stream_name, (str,), "stream_name")
     _check_band(band)
@@ -45,13 +50,20 @@ def nfb(
     # filter channel name list
     ch_names = [ch for ch in ch_names if ch not in ch2remove]
 
+    # wait to fill one buffer
+    logger.info(
+        "Buffer: waiting for an entire %.2f seconds buffer to be fill..",
+        winsize,
+    )
+    time.sleep(winsize)
+    logger.info("Buffer: ready!")
+
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
     info.set_montage("standard_1020")
-    feedback = TopomapMPL(info)
-
-    # wait to fill one buffer
-    time.sleep(winsize)
+    logger.info("Topomap: creating display window..")
+    feedback = TopomapMPL(info, figsize)
+    logger.info("Topomap: ready!")
 
     # main loop
     while True:

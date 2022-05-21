@@ -93,6 +93,7 @@ class _Topomap(ABC):
         return info
 
 
+@fill_doc
 class TopomapMPL(_Topomap):
     """
     Topographic map feedback using matplotlib.
@@ -100,9 +101,7 @@ class TopomapMPL(_Topomap):
     Parameters
     ----------
     %(info)s
-    figsize : tuple
-        2-sequence tuple defining the matplotlib figure size as (width, height)
-        in inches.
+    %(figsize)s
     """
 
     def __init__(
