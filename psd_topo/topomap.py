@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -12,8 +13,8 @@ from .utils._logs import logger
 
 
 @fill_doc
-class _Feedback(ABC):
-    """Abstract class defining a feedback window.
+class _Topomap(ABC):
+    """Abstract class defining a topographic map feedback.
 
     Parameters
     ----------
@@ -22,7 +23,7 @@ class _Feedback(ABC):
 
     @abstractmethod
     def __init__(self, info):
-        self._info = _Feedback._check_info(info)
+        self._info = _Topomap._check_info(info)
         # define colorbar range
         self._vmin = None
         self._vmax = None
@@ -56,7 +57,7 @@ class _Feedback(ABC):
 
     # ------------------------------------------------------------------------
     @property
-    def info(self):
+    def info(self) -> Info:
         """MNE Info instance with a montage.
 
         :type: `mne.Info`
@@ -64,13 +65,19 @@ class _Feedback(ABC):
         return self._info
 
     @property
-    def vmin(self):
-        """Minimum value of the colormap range."""
+    def vmin(self) -> float:
+        """Minimum value of the colormap range.
+
+        :type: float
+        """
         return self._vmin
 
     @property
-    def vmax(self):
-        """Maximum value of the colormap range."""
+    def vmax(self) -> float:
+        """Maximum value of the colormap range.
+
+        :type: float
+        """
         return self._vmax
 
     # ------------------------------------------------------------------------
@@ -86,25 +93,29 @@ class _Feedback(ABC):
         return info
 
 
-class FeedbackMPL(_Feedback):
+class TopomapMPL(_Topomap):
     """
-    Feedback window using matplotlib.
+    Topographic map feedback using matplotlib.
 
     Parameters
     ----------
     %(info)s
+    figsize : tuple
+        2-sequence tuple defining the matplotlib figure size as (width, height)
+        in inches.
     """
 
     def __init__(
         self,
         info: Info,
+        figsize: Tuple[float, float] = (3, 3),
     ):
         if plt.get_backend() != "QtAgg":
             plt.switch_backend("QtAgg")
         if not plt.isinteractive():
             plt.ion()  # enable interactive mode
         super().__init__(info)
-        self._fig, self._axes = plt.subplots(1, 1, figsize=(3, 3))
+        self._fig, self._axes = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap
         self._kwargs = dict(
             vmin=self._vmin,
@@ -127,7 +138,7 @@ class FeedbackMPL(_Feedback):
             **self._kwargs,
         )
 
-    @copy_doc(_Feedback.update)
+    @copy_doc(_Topomap.update)
     def update(self, topodata: NDArray[float]):
         topodata = super().update(topodata)
         self._update_topoplot(topodata)

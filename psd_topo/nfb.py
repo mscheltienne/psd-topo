@@ -5,12 +5,14 @@ import numpy as np
 from bsl import StreamReceiver
 from mne import create_info
 
-from .feedback import FeedbackMPL
 from .fft import _fft
+from .topomap import TopomapMPL
 from .utils._checks import _check_band, _check_type
 
 
-def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
+def nfb(
+    stream_name: str, band: Tuple[float, float] = (8, 13), winsize: float = 5.0
+):
     """Neurofeedback loop.
 
     Parameters
@@ -18,12 +20,19 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     stream_name : str
         The name of the LSL stream to connect to.
     %(band)s
+    winsize : float
+        Duration of the acquisition window in seconds.
     """
     _check_type(stream_name, (str,), "stream_name")
     _check_band(band)
+    _check_type(winsize, ("numeric",), "winsize")
+    if winsize <= 0:
+        raise ValueError("The window size must be a strictly positive number.")
 
     # create receiver and feedback
-    sr = StreamReceiver(bufsize=5, winsize=5, stream_name=stream_name)
+    sr = StreamReceiver(
+        bufsize=winsize, winsize=winsize, stream_name=stream_name
+    )
 
     # retrieve sampling rate and channels
     fs = sr.streams[stream_name].sample_rate
@@ -39,10 +48,10 @@ def nfb(stream_name: str, band: Tuple[float, float] = (8, 13)):
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
     info.set_montage("standard_1020")
-    feedback = FeedbackMPL(info)
+    feedback = TopomapMPL(info)
 
     # wait to fill one buffer
-    time.sleep(1)
+    time.sleep(winsize)
 
     # main loop
     while True:
