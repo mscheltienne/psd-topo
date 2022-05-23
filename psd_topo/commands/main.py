@@ -46,17 +46,13 @@ def run():
         help="figure size for the matplotlib backend",
     )
     parser.add_argument(
-        "--verbosity", help="enable debug logs", action="store_true"
+        "--verbose", help="enable debug logs", action="store_true"
     )
     args = parser.parse_args()
 
     # set verbosity
-    if args.verbosity:
-        set_log_level("DEBUG")
-        verbose = "DEBUG"
-    else:
-        set_log_level("INFO")
-        verbose = "INFO"
+    verbose = "DEBUG" if args.verbose else "INFO"
+    set_log_level(verbose)
 
     # start individual processes
     print("\n>> Press ENTER to stop.\n")
