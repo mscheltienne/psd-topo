@@ -44,9 +44,9 @@ def read_raw_xdf(fname):
     )
 
     # rename trigger channels and set channel type
-    raw.set_channel_types(mapping=dict(TRG='stim'))
-    raw.rename_channels(mapping=dict(TRG='TRIGGER'))
-    assert raw.ch_names[-1] == 'TRIGGER'  # sanity-check
+    raw.set_channel_types(mapping=dict(TRG="stim"))
+    raw.rename_channels(mapping=dict(TRG="TRIGGER"))
+    assert raw.ch_names[-1] == "TRIGGER"  # sanity-check
     raw.reorder_channels([raw.ch_names[-1]] + raw.ch_names[:-1])
 
     return raw
