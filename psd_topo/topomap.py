@@ -28,8 +28,8 @@ class _Topomap(ABC):
         self._vmin = None
         self._vmax = None
         self._inc = 0
-        self._vmin_arr = np.zeros(100)
-        self._vmax_arr = np.zeros(100)
+        self._vmin_arr = np.ones(100) * np.nan
+        self._vmax_arr = np.ones(100) * np.nan
 
     @abstractmethod
     def update(self, topodata: NDArray[float]):
@@ -42,7 +42,6 @@ class _Topomap(ABC):
             1D array of shape (n_channels, ) containing the new data samples to
             plot.
         """
-        topodata -= np.mean(topodata)
         # update arrays that stores 100 points for vmin/vmax
         self._vmin_arr[self._inc % 100] = np.min(topodata)
         self._vmax_arr[self._inc % 100] = np.max(topodata)
@@ -51,10 +50,15 @@ class _Topomap(ABC):
         if self._inc == 100:
             logger.info("Vmin/Vmax calibrated!")
         # update vmin/vmax
-        self._vmin = np.percentile(self._vmin_arr, 10)
-        self._vmax = np.percentile(self._vmax_arr, 90)
-        logger.debug("Vmin: %.3f -- Vmax: %.3f", self._vmin, self._vmax)
-        return topodata
+        self._vmin = np.percentile(
+            self._vmin_arr[~np.isnan(self._vmin_arr)], 5
+        )
+        self._vmax = np.percentile(
+            self._vmax_arr[~np.isnan(self._vmax_arr)], 95
+        )
+        logger.debug(
+            "%i --Vmin: %.3f -- Vmax: %.3f", self._inc, self._vmin, self._vmax
+        )
 
     # ------------------------------------------------------------------------
     @property
@@ -118,9 +122,7 @@ class TopomapMPL(_Topomap):
         self._fig, self._axes = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap
         self._kwargs = dict(
-            vmin=self._vmin,
-            vmax=self._vmax,
-            cmap="rainbow",
+            cmap="Purples",
             sensors=False,
             res=64,
             axes=self._axes,
@@ -140,7 +142,7 @@ class TopomapMPL(_Topomap):
 
     @copy_doc(_Topomap.update)
     def update(self, topodata: NDArray[float]):
-        topodata = super().update(topodata)
+        super().update(topodata)
         self._update_topoplot(topodata)
         # redraw figure
         self._fig.canvas.draw()
@@ -149,7 +151,13 @@ class TopomapMPL(_Topomap):
     def _update_topoplot(self, topodata: NDArray[float]):
         """Update topographic plot."""
         self._axes.clear()
-        plot_topomap(topodata, self._info, **self._kwargs)
+        plot_topomap(
+            topodata,
+            self._info,
+            vmin=self._vmin,
+            vmax=self._vmax,
+            **self._kwargs,
+        )
 
     # ------------------------------------------------------------------------
     @property
