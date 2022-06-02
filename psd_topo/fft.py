@@ -46,7 +46,7 @@ def fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
 @copy_doc(fft)
 def _fft(data: NDArray[float], fs: float, band: Tuple[float, float], dB: bool):
     winsize = data.shape[-1]
-    # mutliply the data with a window
+    # multiply the data with a window
     window = np.hamming(winsize)
     data = data * window
     # retrieve fft

@@ -1,26 +1,113 @@
+[build-system]
+requires = ['setuptools >= 61.0.0', 'wheel']
+build-backend = 'setuptools.build_meta'
+
+[project]
+name = 'psd_topo'
+version = '0.1.0'
+description = 'Real-time PSD topographic display.'
+readme = 'README.md'
+license = {file = 'LICENSE'}
+requires-python = '>=3.8'
+authors = [
+    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'},
+]
+maintainers = [
+    {name = 'Mathieu Scheltienne', email = 'mathieu.scheltienne@fcbg.ch'},
+]
+keywords = [
+    'python',
+    'neuroscience',
+    'neuroimaging',
+    'topographies',
+    'brain',
+    'visualization',
+]
+classifiers = [
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Natural Language :: English',
+    'License :: OSI Approved :: MIT License',
+]
+dependencies = [
+    'numpy',
+    'scipy',
+    'bsl==0.4.0',
+    'mne',
+    'pyxdf',
+    'matplotlib',
+]
+
+[project.optional-dependencies]
+style = [
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'pydocstyle[toml]',
+]
+test = [
+    'pytest',
+    'pytest-cov',
+]
+build = [
+    'build',
+    'twine',
+]
+all = [
+    'black',
+    'codespell',
+    'isort',
+    'flake8',
+    'pydocstyle[toml]',
+    'pytest',
+    'pytest-cov',
+    'build',
+    'twine',
+]
+
+[project.urls]
+homepage = 'https://github.com/mscheltienne/psd-topo'
+documentation = 'https://github.com/mscheltienne/psd-topo'
+source = 'https://github.com/mscheltienne/psd-topo'
+tracker = 'https://github.com/mscheltienne/psd-topo/issues'
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ['psd_topo*']
+exclude = ['^.*tests']
+
 [tool.black]
 line-length = 79
-target-version = ['py37']
+target-version = ['py38']
 include = '\.pyi?$'
 extend-exclude = '''
 (
       __pycache__
     | \.github
     | setup.py
-    | doc/
-    | examples/
-    | tutorials/
 )
 '''
 
 [tool.isort]
-profile = "black"
+profile = 'black'
 multi_line_output = 3
 line_length = 79
-py_version = 37
+py_version = 38
 extend_skip_glob = [
     'setup.py',
-    'doc/*',
-    'examples/*',
-    'tutorials/*'
-    ]
+]
+
+[tool.pydocstyle]
+convention = 'numpy'
+ignore-decorators = '(copy_doc|property|.*setter|.*getter|pyqtSlot)'
+match = '^(?!setup|__init__|test_).*\.py'
+match-dir = '^(?!build|dist|\.).*'
+add_ignore = 'D100,D104,D107'

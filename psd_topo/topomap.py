@@ -33,8 +33,7 @@ class _Topomap(ABC):
 
     @abstractmethod
     def update(self, topodata: NDArray[float]):
-        """
-        Update the topographic map with the new data array (n_channels, ).
+        """Update the topographic map with the new data array (n_channels, ).
 
         Parameters
         ----------
@@ -88,7 +87,7 @@ class _Topomap(ABC):
     # ------------------------------------------------------------------------
     @staticmethod
     def _check_info(info):
-        """Static checker for the provided info instance."""
+        """Check that the info instance has a montage."""
         _check_type(info, (Info,), "info")
         if info.get_montage() is None:
             raise ValueError(
@@ -100,8 +99,7 @@ class _Topomap(ABC):
 
 @fill_doc
 class TopomapMPL(_Topomap):
-    """
-    Topographic map feedback using matplotlib.
+    """Topographic map feedback using matplotlib.
 
     Parameters
     ----------
