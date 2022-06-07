@@ -75,7 +75,7 @@ def nfb(
         # retrieve data
         sr.acquire()
         data, _ = sr.get_window()
-        # remove trigger channel
+        # remove unwanted channels
         data = data[:, ch_idx]
         # compute metric
         fftval = _fft(data.T, fs=fs, band=band, dB=True)  # (n_channels, )
