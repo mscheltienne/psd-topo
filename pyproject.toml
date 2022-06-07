@@ -75,7 +75,7 @@ tracker = 'https://github.com/mscheltienne/psd-topo/issues'
 psd_topo = 'psd_topo.commands.main:run'
 
 [tool.setuptools]
-include-package-data = true
+include-package-data = false
 
 [tool.setuptools.packages.find]
 include = ['psd_topo*']
