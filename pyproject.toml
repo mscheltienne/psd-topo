@@ -44,6 +44,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+build = [
+    'build',
+    'twine',
+]
 style = [
     'black',
     'codespell',
@@ -55,20 +59,10 @@ test = [
     'pytest',
     'pytest-cov',
 ]
-build = [
-    'build',
-    'twine',
-]
 all = [
-    'black',
-    'codespell',
-    'isort',
-    'flake8',
-    'pydocstyle[toml]',
-    'pytest',
-    'pytest-cov',
-    'build',
-    'twine',
+    'psd_topo[build]',
+    'psd_topo[style]',
+    'psd_topo[test]',
 ]
 
 [project.urls]
@@ -85,7 +79,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ['psd_topo*']
-exclude = ['^.*tests']
+exclude = ['psd_topo*tests']
 
 [tool.black]
 line-length = 79
