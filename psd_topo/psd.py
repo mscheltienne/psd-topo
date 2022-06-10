@@ -32,6 +32,7 @@ def plot_psd(
         Minimum frequency of interest in Hz.
     fmax : float
         Maximum frequency of interest in Hz.
+    %(picks_all)s
     %(figsize)s
 
     Returns

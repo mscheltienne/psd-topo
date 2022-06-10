@@ -7,8 +7,15 @@ Inspired from mne.utils.docs.py by Eric Larson <larson.eric.d@gmail.com>
 import sys
 from typing import Callable, List
 
+from mne.utils.docs import docdict as docdict_mne
+
 # ------------------------- Documentation dictionary -------------------------
 docdict = dict()
+
+# documentation from MNE
+keys = ("picks_all",)
+for key in keys:
+    docdict[key] = docdict_mne[key]
 
 # ---------------------------------- verbose ---------------------------------
 docdict[
