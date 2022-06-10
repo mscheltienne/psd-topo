@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -7,6 +6,7 @@ from mne import Info
 from mne.viz import plot_topomap
 from numpy.typing import NDArray
 
+from ._typing import FigSize
 from .utils._checks import _check_type
 from .utils._docs import copy_doc, fill_doc
 from .utils._logs import logger
@@ -110,7 +110,7 @@ class TopomapMPL(_Topomap):
     def __init__(
         self,
         info: Info,
-        figsize: Tuple[float, float] = (3, 3),
+        figsize: FigSize = (3, 3),
     ):
         if plt.get_backend() != "QtAgg":
             plt.switch_backend("QtAgg")
@@ -170,7 +170,7 @@ class TopomapMPL(_Topomap):
 
     # ------------------------------------------------------------------------
     @staticmethod
-    def _check_figsize(figsize):
+    def _check_figsize(figsize: FigSize) -> FigSize:
         """Check the figure size."""
         figsize = (3, 3) if figsize is None else figsize
         _check_type(figsize, (tuple, list), "figsize")
