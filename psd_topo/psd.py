@@ -64,11 +64,23 @@ def plot_psd(
         window="hamming",
         **kwargs,
     )
-    # psds shape is (n_ch, n_freqs, n_seg)
+    assert psds.ndim == 3  # sanity-check, shape is (n_ch, n_freqs, n_seg)
     psds = np.average(psds, axis=(0, 1))  # average across the channels / freqs
+    assert psds.ndim == 1  # sanity-check
+    # recreate time-axis
+    step = winsize - overlap
+    times = np.arange(0, step * psds.size, step) + winsize / 2
+    # scaling to dB
+    scaling = 1e6  # default scaling
+    psds *= scaling * scaling
+    np.log10(np.maximum(psds, np.finfo(float).tiny), out=psds)
+    psds *= 10
     # create figure
     f, ax = plt.subplots(1, 1)
-    ax.plot(psds)
+    ax.plot(times, psds)
     # format figure
-    ax.axis("off")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("PSD $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$")
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
     return f, ax
