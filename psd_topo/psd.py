@@ -80,6 +80,8 @@ def plot_psd(
     ax.plot(times, psds)
     # format figure
     ax.set_xlabel("Time (s)")
+    ax.set_xticks(np.arange(0, times[-1], 60))
+    ax.set_xticks(np.arange(0, times[-1], 20), minor=True)
     ax.set_ylabel("PSD $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$")
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
