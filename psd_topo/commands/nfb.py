@@ -6,7 +6,7 @@ from psd_topo.utils import search_amplifiers
 
 
 def run():
-    """Entrypoint for main <command> usage."""
+    """Entrypoint for nfb <command> usage."""
     parser = argparse.ArgumentParser(
         prog="PSD-Topo", description="Real-time PSD topography"
     )

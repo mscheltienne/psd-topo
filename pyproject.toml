@@ -73,6 +73,7 @@ tracker = 'https://github.com/mscheltienne/psd-topo/issues'
 
 [project.scripts]
 psd_topo = 'psd_topo.commands.nfb:run'
+task = 'psd_topo.commands.task:run'
 
 [tool.setuptools]
 include-package-data = false
