@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Tuple
 
 import mne
 import numpy as np
@@ -6,39 +6,31 @@ from mne.io import BaseRaw
 from mne.io.pick import _DATA_CH_TYPES_ORDER_DEFAULT
 from pyxdf import load_xdf
 
-from ..utils import AMP_PREFIX
-from ..utils._checks import _check_type
+from ..config import load_config
 
 
-def read_raw_xdf(fname, marker_stream: Optional[str] = None) -> List[BaseRaw]:
+def read_raw_xdf(fname) -> List[BaseRaw]:
     """Read raw XDF files saved with the LabRecorder.
 
     All streams that have "WS-" in their name will be loaded in a separate
-    Raw instance. If marker_stream is provided, the TRIGGER channel from the
-    "WS-" streams will be replaced with the data on the marker stream.
+    Raw instance. The TRIGGER channel from the "WS-" streams will be replaced
+    with the data on the marker stream.
 
     Parameters
     ----------
     fname : file-like
         Path to the -raw.fif file to load.
-    marker_stream : str | None
-        Name of the marker stream. If None, the TRIGGER channel from the WS-
-        amplifier will contain the hardware triggers.
 
     Returns
     -------
     raws : list of Raw
         List of loaded MNE raw instances.
     """
-    _check_type(marker_stream, (str, None), "marker_stream")
     streams, _ = load_xdf(fname)
-    eeg_streams = _find_streams(streams, stream_name=AMP_PREFIX)
+    amp_prefix, trigger_stream_name = load_config()
+    eeg_streams = _find_streams(streams, stream_name=amp_prefix)
     assert len(eeg_streams) != 0  # sanity-check
-    marker_stream = (
-        []
-        if marker_stream is None
-        else _find_streams(streams, stream_name=marker_stream)
-    )
+    marker_stream = _find_streams(streams, stream_name=trigger_stream_name)
     assert len(marker_stream) in (0, 1)  # sanity-check
 
     # retrieve the marker stream

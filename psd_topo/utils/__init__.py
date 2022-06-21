@@ -1,3 +1,3 @@
 """Utilities module."""
 
-from .utils import AMP_PREFIX, search_amplifiers  # noqa: F401
+from .utils import search_amplifiers  # noqa: F401

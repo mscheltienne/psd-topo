@@ -3,7 +3,7 @@ import argparse
 from bsl.triggers import LSLTrigger
 
 from psd_topo import set_log_level
-from psd_topo.config import load_triggers
+from psd_topo.config import load_config, load_triggers
 
 
 def run():
@@ -21,7 +21,8 @@ def run():
     set_log_level(verbose)
 
     # set trigger
-    trigger = LSLTrigger("PSD-markers", verbose=True)
+    _, trigger_stream_name = load_config()
+    trigger = LSLTrigger(trigger_stream_name, verbose=True)
     events = load_triggers()
 
     # wait for LabRecorder to be started
