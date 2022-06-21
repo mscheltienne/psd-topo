@@ -22,6 +22,7 @@ keywords = [
     'topographies',
     'brain',
     'visualization',
+    'psd',
 ]
 classifiers = [
     'Operating System :: Microsoft :: Windows',
@@ -36,7 +37,6 @@ classifiers = [
 ]
 dependencies = [
     'numpy',
-    'scipy',
     'bsl==0.5.0',
     'mne',
     'pyxdf',
