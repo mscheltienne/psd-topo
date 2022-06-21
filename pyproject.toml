@@ -82,6 +82,9 @@ include-package-data = false
 include = ['psd_topo*']
 exclude = ['psd_topo*tests']
 
+[tool.setuptools.package-data]
+"psd_topo.config" = ["*.ini"]
+
 [tool.black]
 line-length = 79
 target-version = ['py38']
