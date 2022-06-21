@@ -1,6 +1,6 @@
 import argparse
 
-from bsl.triggers import ParallelPortTrigger
+from bsl.triggers import LSLTrigger
 
 from psd_topo import set_log_level
 
@@ -20,7 +20,7 @@ def run():
     set_log_level(verbose)
 
     # set trigger
-    trigger = ParallelPortTrigger("arduino")
+    trigger = LSLTrigger("PSD-markers", verbose=True)
 
     # tasks with manual key-input triggers
     input(">>> Press ENTER to send 'eye-open' trigger.")
