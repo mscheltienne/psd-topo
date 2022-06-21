@@ -34,4 +34,6 @@ def run():
     trigger.signal(events.eye_close)
     input(">>> Press ENTER to send 'lecture' trigger.")
     trigger.signal(events.lecture)
-    input(">>> Press ENTER to close.")
+    input(
+        ">>> Press ENTER to close after stopping the recording on LabRecorder."
+    )

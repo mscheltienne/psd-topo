@@ -44,7 +44,7 @@ def read_raw_xdf(fname, marker_stream: Optional[str] = None) -> List[BaseRaw]:
     # retrieve the marker stream
     if len(marker_stream) == 1:
         stream = marker_stream[0][1]
-        marker = (stream["time_stamps"], stream["time_series"])
+        marker = (stream["time_stamps"], stream["time_series"][:, 0])
         del stream
     else:
         marker = None
@@ -54,7 +54,7 @@ def read_raw_xdf(fname, marker_stream: Optional[str] = None) -> List[BaseRaw]:
     for _, stream in eeg_streams:
         # retrieve information
         ch_names, ch_types, units = _get_eeg_ch_info(stream)
-        sfreq = int(stream["info"]["nominal_srate"][0])
+        sfreq = int(eval(stream["info"]["nominal_srate"][0]))
         data = stream["time_series"].T
 
         # create MNE raw
@@ -64,21 +64,23 @@ def read_raw_xdf(fname, marker_stream: Optional[str] = None) -> List[BaseRaw]:
         # drop AUX and reference channels
         raw.drop_channels(["X1", "X2", "X3", "A2"])
 
-        # scaling
-        def uVolt2Volt(timearr):
-            """Convert from uV to Volts."""
-            return timearr * 1e-6
-
         # rename trigger channels and set channel type
         raw.set_channel_types(mapping=dict(TRG="stim"))
         raw.rename_channels(mapping=dict(TRG="TRIGGER"))
         assert raw.ch_names[-1] == "TRIGGER"  # sanity-check
         raw.reorder_channels([raw.ch_names[-1]] + raw.ch_names[:-1])
 
+        # scaling
+        def uVolt2Volt(timearr):
+            """Convert from uV to Volts."""
+            return timearr * 1e-6
+
+        raw.apply_function(uVolt2Volt, picks="eeg", channel_wise=True)
+
         # add marker on trigger channel
         if marker is not None:
             events = list()
-            for ts, value in zip(marker):
+            for ts, value in zip(*marker):
                 next_index = np.searchsorted(stream["time_stamps"], ts)
                 events.append([next_index, 0, value])
             events = np.array(events)
