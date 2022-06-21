@@ -3,6 +3,7 @@ import argparse
 from bsl.triggers import LSLTrigger
 
 from psd_topo import set_log_level
+from psd_topo.config import load_triggers
 
 
 def run():
@@ -21,15 +22,16 @@ def run():
 
     # set trigger
     trigger = LSLTrigger("PSD-markers", verbose=True)
+    events = load_triggers()
 
     # wait for LabRecorder to be started
     input(">>> Press ENTER after starting the recording on the LabRecorder.")
 
     # tasks with manual key-input triggers
     input(">>> Press ENTER to send 'eye-open' trigger.")
-    trigger.signal(1)
+    trigger.signal(events.eye_open)
     input(">>> Press ENTER to send 'eye-close' trigger.")
-    trigger.signal(2)
+    trigger.signal(events.eye_close)
     input(">>> Press ENTER to send 'lecture' trigger.")
-    trigger.signal(3)
+    trigger.signal(events.lecture)
     input(">>> Press ENTER to close.")
