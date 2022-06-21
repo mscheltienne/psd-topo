@@ -4,6 +4,8 @@ from bsl.utils.lsl import list_lsl_streams
 
 from ._checks import _check_type
 
+AMP_PREFIX = "WS-"
+
 
 def search_amplifiers(n: int) -> List[str]:
     """Search the available DSI-24 amplifiers on the network.
@@ -27,7 +29,7 @@ def search_amplifiers(n: int) -> List[str]:
 
     stream_names, _ = list_lsl_streams(ignore_markers=True)
     stream_names = [
-        stream for stream in stream_names if stream.startswith("WS-")
+        stream for stream in stream_names if stream.startswith(AMP_PREFIX)
     ]
     if len(stream_names) != n:
         raise RuntimeError(
