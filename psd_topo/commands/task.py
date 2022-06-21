@@ -22,6 +22,9 @@ def run():
     # set trigger
     trigger = LSLTrigger("PSD-markers", verbose=True)
 
+    # wait for LabRecorder to be started
+    input(">>> Press ENTER after starting the recording on the LabRecorder.")
+
     # tasks with manual key-input triggers
     input(">>> Press ENTER to send 'eye-open' trigger.")
     trigger.signal(1)
