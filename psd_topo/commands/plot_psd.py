@@ -31,7 +31,7 @@ def run():
         overlap=4.8,
         fmin=8.0,
         fmax=13.0,
-        picks="eeg",
+        picks=["O1", "O2"],
         labels=streams,
         default_color="lightblue",
         colors=[(0, 153, 153), (255, 102, 102), "black"],
