@@ -33,7 +33,7 @@ def run():
         fmax=13.0,
         picks="eeg",
         labels=streams,
-        default_color="crimson",
-        colors=None,
+        default_color="lightblue",
+        colors=[(0, 153, 153), (255, 102, 102), "black"],
     )
     fig.savefig("psd-plot.png", dpi=300)
