@@ -9,7 +9,7 @@ from psd_topo.config import load_config, load_triggers
 def run():
     """Entrypoint for task <command> usage."""
     parser = argparse.ArgumentParser(
-        prog="PSD-Topo", description="Real-time PSD topography"
+        prog="PSD-Topo task", description="Task for Magda"
     )
     parser.add_argument(
         "--verbose", help="enable debug logs", action="store_true"

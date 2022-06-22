@@ -9,7 +9,7 @@ from pyxdf import load_xdf
 from ..config import load_config
 
 
-def read_raw_xdf(fname) -> List[BaseRaw]:
+def read_raw_xdf(fname) -> Tuple[List[BaseRaw], List[str]]:
     """Read raw XDF files saved with the LabRecorder.
 
     All streams that have "WS-" in their name will be loaded in a separate
@@ -25,6 +25,8 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
     -------
     raws : list of Raw
         List of loaded MNE raw instances.
+    stream_names = list of str
+        List of stream names.
     """
     streams, _ = load_xdf(fname)
     amp_prefix, trigger_stream_name = load_config()
@@ -43,7 +45,10 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
 
     # create the raw instances
     raws = list()
+    stream_names = list()
     for _, stream in eeg_streams:
+        stream_names.append(stream["info"]["name"][0])
+
         # retrieve information
         ch_names, ch_types, units = _get_eeg_ch_info(stream)
         sfreq = int(eval(stream["info"]["nominal_srate"][0]))
@@ -81,7 +86,7 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
         del stream
         raws.append(raw)
 
-    return raws
+    return raws, stream_names
 
 
 def _find_streams(
