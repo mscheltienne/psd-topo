@@ -98,7 +98,7 @@ def plot_psd(
         psds.append((times, psd, events))
 
     # create figure
-    fig, axis = plt.subplots(len(raws), 1, figsize=figsize)
+    fig, axis = plt.subplots(len(raws), 1, figsize=figsize, sharex=True)
     axis = [axis] if len(raws) == 1 else list(axis)
     for k, (times, psd, events) in enumerate(psds):  # sane number as raws
         previous_ev = 0
@@ -212,5 +212,12 @@ def _format_figure(
     axis[-1].set_xlabel("Time (s)")
     axis[-1].set_xticks(np.arange(0, tmax, 60))
     axis[-1].set_xticks(np.arange(0, tmax, 20), minor=True)
-    axis[len(axis) // 2].set_ylabel("PSD $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$")
+    fig.text(
+        0.03,
+        0.5,
+        "PSD $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$",
+        va="center",
+        rotation="vertical",
+    )
     fig.tight_layout()
+    fig.subplots_adjust(left=0.1)
