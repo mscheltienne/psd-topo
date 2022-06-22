@@ -34,6 +34,6 @@ def run():
         picks=["O1", "O2"],
         labels=streams,
         default_color="lightblue",
-        colors=[(0, 153, 153), (255, 102, 102), "black"],
+        colors=[(0, 0.6, 0.6), (1, 0.4, 0.4), "black"],
     )
     fig.savefig("psd-plot.png", dpi=300)
