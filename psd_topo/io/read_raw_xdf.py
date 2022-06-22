@@ -35,20 +35,15 @@ def read_raw_xdf(fname) -> Tuple[List[BaseRaw], List[str]]:
     marker_stream = _find_streams(streams, stream_name=trigger_stream_name)
 
     # retrieve the marker stream
-    assert len(marker_stream) in (0, 1)  # sanity-check
-    if len(marker_stream) == 1:
-        stream = marker_stream[0][1]
-        marker = (stream["time_stamps"], stream["time_series"][:, 0])
-        del stream
-    else:
-        marker = None
+    assert len(marker_stream) == 1  # sanity-check
+    stream = marker_stream[0][1]
+    marker = (stream["time_stamps"], stream["time_series"][:, 0])
+    del stream
 
     # create the raw instances
     raws = list()
     stream_names = list()
     for _, stream in eeg_streams:
-        stream_names.append(stream["info"]["name"][0])
-
         # retrieve information
         ch_names, ch_types, units = _get_eeg_ch_info(stream)
         sfreq = int(eval(stream["info"]["nominal_srate"][0]))
@@ -74,17 +69,20 @@ def read_raw_xdf(fname) -> Tuple[List[BaseRaw], List[str]]:
         raw.apply_function(uVolt2Volt, picks="eeg", channel_wise=True)
 
         # add marker on trigger channel
-        if marker is not None:
-            events = list()
-            for ts, value in zip(*marker):
-                next_index = np.searchsorted(stream["time_stamps"], ts)
-                events.append([next_index, 0, value])
-            events = np.array(events)
+        events = list()
+        for ts, value in zip(*marker):
+            next_index = np.searchsorted(stream["time_stamps"], ts)
+            events.append([next_index, 0, value])
+        events = np.array(events)
+        try:
             raw.add_events(events, stim_channel="TRIGGER", replace=True)
+        except ValueError:
+            continue
 
         # save and clean-up
-        del stream
+        stream_names.append(stream["info"]["name"][0])
         raws.append(raw)
+        del stream
 
     return raws, stream_names
 
