@@ -14,12 +14,12 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
 
     All streams that have "WS-" in their name will be loaded in a separate
     Raw instance. The TRIGGER channel from the "WS-" streams will be replaced
-    with the data on the marker stream.
+    with the data on the marker stream if found.
 
     Parameters
     ----------
     fname : file-like
-        Path to the -raw.fif file to load.
+        Path to the .xdf file to load.
 
     Returns
     -------
@@ -31,9 +31,9 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
     eeg_streams = _find_streams(streams, stream_name=amp_prefix)
     assert len(eeg_streams) != 0  # sanity-check
     marker_stream = _find_streams(streams, stream_name=trigger_stream_name)
-    assert len(marker_stream) in (0, 1)  # sanity-check
 
     # retrieve the marker stream
+    assert len(marker_stream) in (0, 1)  # sanity-check
     if len(marker_stream) == 1:
         stream = marker_stream[0][1]
         marker = (stream["time_stamps"], stream["time_series"][:, 0])
@@ -56,13 +56,12 @@ def read_raw_xdf(fname) -> List[BaseRaw]:
         # drop AUX and reference channels
         raw.drop_channels(["X1", "X2", "X3", "A2"])
 
-        # rename trigger channels and set channel type
-        raw.set_channel_types(mapping=dict(TRG="stim"))
+        # rename trigger channel
         raw.rename_channels(mapping=dict(TRG="TRIGGER"))
         assert raw.ch_names[-1] == "TRIGGER"  # sanity-check
         raw.reorder_channels([raw.ch_names[-1]] + raw.ch_names[:-1])
 
-        # scaling
+        # scaling the EEG channels
         def uVolt2Volt(timearr):
             """Convert from uV to Volts."""
             return timearr * 1e-6
@@ -117,12 +116,12 @@ def _get_eeg_ch_info(stream: dict) -> Tuple[List, List, List]:
     # get channels labels, types and units
     for ch in stream["info"]["desc"][0]["channels"][0]["channel"]:
         ch_type = ch["type"][0].lower()
-        if ch_type not in _DATA_CH_TYPES_ORDER_DEFAULT:
-            # to be changed to a dict if to many entries exist.
-            ch_type = "stim" if ch_type == "markers" else ch_type
-            ch_type = "misc" if ch_type == "aux" else ch_type
-
-        ch_names.append(ch["label"][0])
+        ch_type = (
+            ch_type if ch_type in _DATA_CH_TYPES_ORDER_DEFAULT else "misc"
+        )
+        ch_name = ch["label"][0]
+        ch_type = "stim" if ch_name == "TRG" else ch_type
+        ch_names.append(ch_name)
         ch_types.append(ch_type)
         units.append(ch["unit"][0])
 

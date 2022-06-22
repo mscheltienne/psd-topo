@@ -22,12 +22,15 @@ def plot_psd(
     fmax: float = 13.0,
     picks: Picks = "eeg",
     labels: Optional[Union[List[str], Tuple[str, ...]]] = None,
+    default_color: Color = "crimson",
     colors: Optional[Union[List[Color], Tuple[Color, ...]]] = None,
-    figsize: FigSize = (5, 5),
+    figsize: FigSize = (10, 5),
 ):
     """Plot the power spectral density using welch windows.
 
-    The raw instance must have the events present in the triggers.ini.
+    The raws instance must be loaded with the io.read_raw_xdf function and must
+    have been recorded with the 'task' entry-point. Each raw instance must
+    include all the triggers define in the triggers.ini.
 
     Parameters
     ----------
@@ -43,9 +46,12 @@ def plot_psd(
         Maximum frequency of interest in Hz.
     %(picks_all)s
     labels : list of str | tuple of str
+    default_color : color
+        The color to use outside the event time-ranges.A color can be defined
+        as a string or a RGB / RGBA tuple.
     colors : list of colors | tuple of colors
         The colors to use for the different events. A color can be defined as
-        a string or a RGB tuple.
+        a string or a RGB / RGBA tuple.
     %(figsize)s
 
     Returns
@@ -53,26 +59,12 @@ def plot_psd(
     fig : Figure
     axis : Axes
     """
-    (
-        raws,
-        winsize,
-        overlap,
-        fmin,
-        fmax,
-        picks,
-        labels,
-        colors,
-    ) = _check_arguments(
-        raws, winsize, overlap, fmin, fmax, picks, labels, colors
-    )
+    _check_arguments(raws, winsize, overlap, fmin, fmax, picks, labels)
+    colors = _check_colors(default_color, colors)
     # prepare kwargs
-    fs = raws[0].info["sfreq"]
     kwargs = dict(
         fmin=fmin,
         fmax=fmax,
-        n_fft=int(winsize * fs),
-        n_per_seg=int(winsize * fs),
-        n_overlap=int(overlap * fs),
         picks=picks,
     )
     # compute psds, times and retrieve events
@@ -82,6 +74,9 @@ def plot_psd(
             raw,
             average=None,
             window="hamming",
+            n_fft=int(winsize * raw.info["sfreq"]),
+            n_per_seg=int(winsize * raw.info["sfreq"]),
+            n_overlap=int(overlap * raw.info["sfreq"]),
             **kwargs,
         )
         assert psd.ndim == 3  # sanity-check, shape is (n_ch, n_freqs, n_seg)
@@ -101,24 +96,22 @@ def plot_psd(
         events = (events[:, 0] / raw.info["sfreq"]) + winsize / 2
         # store
         psds.append((times, psd, events))
-    # clean-up
-    del psd
-    del times
-    del events
+
     # create figure
-    fig, axis = plt.subplots(len(raws), 1)
+    fig, axis = plt.subplots(len(raws), 1, figsize=figsize)
     axis = [axis] if len(raws) == 1 else list(axis)
-    for k, (times, psd, events) in enumerate(psds):
+    for k, (times, psd, events) in enumerate(psds):  # sane number as raws
+        previous_ev = 0
         for i, event in enumerate(events):
             idx = np.searchsorted(times, event)
-            axis[k].plot(times[:idx], psd[:idx], color=colors[i])
-            times = times[idx:]
-            psd = psd[idx:]
-    # clean-up
-    del times
-    del psd
-    del events
-    # retrive min/max times
+            axis[k].plot(
+                times[previous_ev:idx], psd[previous_ev:idx], color=colors[i]
+            )
+            previous_ev = idx
+        # plot the last event
+        axis[k].plot(times[previous_ev:], psd[previous_ev:], color=colors[-1])
+
+    # retrieve min/max times
     tmin = np.min([time[0] for time, _, _ in psds])
     tmax = np.min([time[-1] for time, _, _ in psds])
     # format figure
@@ -130,20 +123,18 @@ def _check_arguments(
     raws: Union[List[BaseRaw], Tuple[BaseRaw]],
     winsize: float,
     overlap: float,
-    fmin: float = 8.0,
-    fmax: float = 13.0,
-    picks: Picks = "eeg",
-    labels: Optional[Union[List[str], Tuple[str, ...]]] = None,
-    colors: Optional[Union[List[Color], Tuple[Color, ...]]] = None,
+    fmin: float,
+    fmax: float,
+    picks: Picks,
+    labels: Union[List[str], Tuple[str, ...], None],
 ):
     """Check the arguments of plot_psd."""
     triggers = load_triggers()
     # check raw instances
     _check_type(raws, (list, tuple), "raws")
-    assert 1 < len(raws), "only supports more than one raw"
+    assert len(raws) != 0
     for raw in raws:
         _check_type(raw, (BaseRaw,), "raw")
-    assert all(raw.info["sfreq"] == raws[0].info["sfreq"] for raw in raws)
     events = [mne.find_events(raw, "TRIGGER") for raw in raws]
     assert all(event.shape == events[0].shape for event in events)
     assert events[0].size != 0
@@ -165,7 +156,14 @@ def _check_arguments(
         for label in labels:
             _check_type(label, (str,), "label")
         assert len(labels) == len(raws)
-    # check colors
+
+
+def _check_colors(
+    default_color: Color,
+    colors: Union[List[Color], Tuple[Color, ...], None],
+) -> Tuple[Tuple[float, float, float, float], ...]:
+    """Check and format colors as RGBA tuples."""
+    triggers = load_triggers()
     if colors is not None:
         _check_type(colors, (list, tuple), "colors")
         assert len(triggers.by_value) == len(colors)
@@ -173,18 +171,27 @@ def _check_arguments(
         for k, color in enumerate(colors):
             _check_type(color, (tuple, str), "color")
             if isinstance(color, str):
-                color = mpl_colors.to_rgba(color)
+                color = mpl_colors.to_rgba(color)  # returns a tuple
             if len(color) == 3:
-                color = tuple(list(color) + [1])
+                color = tuple(list(color) + [1.0])
             assert len(color) == 4
             assert all(0 <= c <= 1 for c in color)
             colors[k] = color
-        colors = tuple(colors)  # cast to immutable
     else:
         cmap = plt.cm.get_cmap("viridis", len(triggers.by_value))
         colors = [cmap(k) for k in range(len(triggers.by_value))]
 
-    return raws, winsize, overlap, fmin, fmax, picks, labels, colors
+    _check_type(default_color, (tuple, str), "default_color")
+    if isinstance(default_color, str):
+        default_color = mpl_colors.to_rgba(default_color)  # returns a tuple
+        if len(default_color) == 3:
+            default_color = tuple(list(default_color) + [1.0])
+        assert len(default_color) == 4
+        assert all(0 <= c <= 1 for c in default_color)
+
+    colors = tuple([default_color] + colors)  # cast to immutable
+
+    return colors
 
 
 def _format_figure(
@@ -192,7 +199,7 @@ def _format_figure(
     axis: List[plt.Axes],
     tmin: float,
     tmax: float,
-    labels: Optional[Union[List[str], Tuple[str, ...]]] = None,
+    labels: Union[List[str], Tuple[str, ...], None],
 ):
     """Format the PSD figure."""
     for k, ax in enumerate(axis):

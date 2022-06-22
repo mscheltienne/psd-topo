@@ -38,3 +38,4 @@ def run():
     input(
         ">>> Press ENTER to close after stopping the recording on LabRecorder."
     )
+    del trigger
