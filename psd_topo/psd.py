@@ -215,7 +215,7 @@ def _format_figure(
     fig.text(
         0.03,
         0.5,
-        "PSD $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$",
+        "PSD α-band (8-13 Hz) on O1, O2 - $\\mathrm{µV²/Hz}$$\ \mathrm{(dB)}$",
         va="center",
         rotation="vertical",
     )
