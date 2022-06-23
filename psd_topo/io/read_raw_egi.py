@@ -35,7 +35,7 @@ def read_raw_egi(fname) -> BaseRaw:
     bads = [f"E{k}" for k in bads]
     raw.drop_channels(bads + ["diode"])
 
-    # drop synthetic trigger channel and reconstruct
+    # drop synthetic trigger channel and reconstruct trigger channel
     raw.drop_channels(["STI 014"])
     ch_pattern = re.compile(r"(E\d{1,3})")
     trigger_chs = [ch for ch in raw.ch_names if not re.match(ch_pattern, ch)]
@@ -45,9 +45,6 @@ def read_raw_egi(fname) -> BaseRaw:
     stim = RawArray(stim, info)
     raw.add_channels([stim], force_update_info=True)
     raw.drop_channels(trigger_chs)
-
-    # rename ref
-    raw.rename_channels(dict(E257="VREF"))
 
     # load montage
     montage_fname = Path(fname) / "coordinates.xml"
@@ -65,6 +62,7 @@ def read_raw_egi(fname) -> BaseRaw:
         name = sensor.find("name", namespaces).text
         number = sensor.find("number", namespaces).text
         name = f"E{number}" if name is None else name
+        name = "E257" if name == "VREF" else name
         x = sensor.find("x", namespaces).text
         y = sensor.find("y", namespaces).text
         z = sensor.find("z", namespaces).text
