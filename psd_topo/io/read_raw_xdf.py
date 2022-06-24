@@ -48,6 +48,8 @@ def read_raw_xdf(fname) -> Tuple[List[BaseRaw], List[str]]:
         ch_names, ch_types, units = _get_eeg_ch_info(stream)
         sfreq = int(eval(stream["info"]["nominal_srate"][0]))
         data = stream["time_series"].T
+        if any(elt == 0 for elt in data.shape):
+            continue  # skip empty streams
 
         # create MNE raw
         info = mne.create_info(ch_names, sfreq, ch_types)
