@@ -104,12 +104,15 @@ class TopomapMPL(_Topomap):
     Parameters
     ----------
     %(info)s
+    cmap : str
+        The matplotlib color map name.
     %(figsize)s
     """
 
     def __init__(
         self,
         info: Info,
+        cmap: str = "Purples",
         figsize: FigSize = (3, 3),
     ):
         if plt.get_backend() != "QtAgg":
@@ -117,10 +120,12 @@ class TopomapMPL(_Topomap):
         if not plt.isinteractive():
             plt.ion()  # enable interactive mode
         super().__init__(info)
+        _check_type(cmap, (str,), "cmap")
+        self._cmap = cmap
         self._fig, self._axes = plt.subplots(1, 1, figsize=figsize)
         # define kwargs for plot_topomap
         self._kwargs = dict(
-            cmap="Purples",
+            cmap=self._cmap,
             sensors=False,
             res=64,
             axes=self._axes,
@@ -142,9 +147,6 @@ class TopomapMPL(_Topomap):
     def update(self, topodata: NDArray[float]):
         super().update(topodata)
         self._update_topoplot(topodata)
-        # redraw figure
-        self._fig.canvas.draw()
-        self._fig.canvas.flush_events()
 
     def _update_topoplot(self, topodata: NDArray[float]):
         """Update topographic plot."""
@@ -157,6 +159,11 @@ class TopomapMPL(_Topomap):
             **self._kwargs,
         )
 
+    def redraw(self):
+        """Redraw the canvas."""
+        self._fig.canvas.draw()
+        self._fig.canvas.flush_events()
+
     # ------------------------------------------------------------------------
     @property
     def fig(self) -> plt.Figure:
@@ -167,6 +174,11 @@ class TopomapMPL(_Topomap):
     def axes(self) -> plt.Axes:
         """Matplotlib axes."""
         return self._axes
+
+    @property
+    def cmap(self) -> str:
+        """Matplotlib colormap name."""
+        return self._cmap
 
     # ------------------------------------------------------------------------
     @staticmethod

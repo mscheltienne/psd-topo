@@ -75,6 +75,7 @@ tracker = 'https://github.com/mscheltienne/psd-topo/issues'
 rt_topo = 'psd_topo.commands.rt_topo:run'
 task = 'psd_topo.commands.task:run'
 plot_psd = 'psd_topo.commands.plot_psd:run'
+weather_map = 'psdd_topo.commands.weather_map:run'
 
 [tool.setuptools]
 include-package-data = false

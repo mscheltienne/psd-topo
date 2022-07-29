@@ -13,14 +13,14 @@ from .utils._logs import logger, set_log_level
 
 
 @fill_doc
-def nfb(
+def weather_map(
     stream_name: str,
     band: Tuple[float, float],
     winsize: float,
     figsize: Optional[Tuple[float, float]] = None,
     verbose: Optional[Union[str, int]] = None,
 ) -> None:
-    """Neurofeedback loop.
+    """Online loop to create a "weather map" from an EGI recording.
 
     Parameters
     ----------
@@ -46,13 +46,14 @@ def nfb(
     # retrieve sampling rate and channels
     fs = sr.streams[stream_name].sample_rate
     ch_names = sr.streams[stream_name].ch_list
-    # remove unwanted channels
-    ch2remove = ("TRIGGER", "TRG", "X1", "X2", "X3", "A1", "A2")
+    # remove trigger channel
+    trigger_idx = ch_names.index("TRIGGER")
     ch_idx = np.array(
-        [k for k, ch in enumerate(ch_names) if ch not in ch2remove]
+        [k for k, ch in enumerate(ch_names) if ch != "TRIGGER"]
     )
-    # filter channel name list
-    ch_names = [ch for ch in ch_names if ch not in ch2remove]
+    ch_names = [ch for ch in ch_names if ch != "TRIGGER"]
+    # replace E257 with Cz
+    ch_names[ch_names.index("E257")] = "Cz"
 
     # wait to fill one buffer
     logger.info(
@@ -64,9 +65,9 @@ def nfb(
 
     # create feedback
     info = create_info(ch_names=ch_names, sfreq=fs, ch_types="eeg")
-    info.set_montage("standard_1020")
+    info.set_montage("GSN-HydroCel-257")
     logger.info("Topomap: creating display window..")
-    feedback = TopomapMPL(info, "Purples", figsize)
+    feedback = TopomapMPL(info, "hsv", figsize)
     logger.info("Topomap: ready!")
 
     # main loop
@@ -75,9 +76,15 @@ def nfb(
         sr.acquire()
         data, _ = sr.get_window()
         # remove unwanted channels
-        data = data[:, ch_idx]
+        trigger = data[:, trigger_idx]  # retrieve trigger channel
+        data = data[:, ch_idx]  # retrieve EEG channels
+        # apply CAR
+        data = (data.T - np.average(data, axis=1)).T
         # compute metric
         fftval = _fft(data.T, fs=fs, band=band, dB=True)  # (n_channels, )
         # update feedback
         feedback.update(fftval)
+        if np.any(trigger):
+            idx = np.nonzero(trigger)[0][-1]
+            feedback.axes.set_title(str(trigger[idx]))
         feedback.redraw()

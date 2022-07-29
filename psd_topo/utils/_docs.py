@@ -48,6 +48,15 @@ docdict[
 band : tuple
     Frequency band of interest in Hz as 2 floats, e.g. (8, 13) (edge inc.)."""
 
+# -------------------------------- Real-time ---------------------------------
+docdict["stream_name"] = """
+stream_name : str
+    The name of the LSL stream to connect to."""
+
+docdict["winsize"] = """
+winsize : float
+    Duration of the acquisition window in seconds."""
+
 # ------------------------- Documentation functions --------------------------
 docdict_indented = dict()
 
