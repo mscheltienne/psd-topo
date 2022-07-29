@@ -48,9 +48,7 @@ def weather_map(
     ch_names = sr.streams[stream_name].ch_list
     # remove trigger channel
     trigger_idx = ch_names.index("TRIGGER")
-    ch_idx = np.array(
-        [k for k, ch in enumerate(ch_names) if ch != "TRIGGER"]
-    )
+    ch_idx = np.array([k for k, ch in enumerate(ch_names) if ch != "TRIGGER"])
     ch_names = [ch for ch in ch_names if ch != "TRIGGER"]
     # replace E257 with Cz
     ch_names[ch_names.index("E257")] = "Cz"
