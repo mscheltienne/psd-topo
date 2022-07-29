@@ -1,11 +1,8 @@
 import re
-import xml.etree.ElementTree as ET
-from pathlib import Path
 
 import mne
 import numpy as np
 from mne import create_info
-from mne.channels import make_dig_montage
 from mne.io import BaseRaw, RawArray
 
 
@@ -46,35 +43,9 @@ def read_raw_egi(fname) -> BaseRaw:
     raw.add_channels([stim], force_update_info=True)
     raw.drop_channels(trigger_chs)
 
-    # load montage
-    montage_fname = Path(fname) / "coordinates.xml"
-    # the montage contains 257 channels with the field <number> from 1 to  257
-    # and 3 fiducials: Nasion, LPA, RPA with the number and names:
-    # - Nasion - 258
-    # - Left periauricular point - 259
-    # - Right periauricular point - 260
-    namespaces = {"": "http://www.egi.com/coordinates_mff"}
-    tree = ET.parse(montage_fname)
-    root = tree.getroot()
-    sensors = root.findall(".//sensorLayout/sensors/sensor", namespaces)
-    ch_pos = dict()
-    for sensor in sensors:
-        name = sensor.find("name", namespaces).text
-        number = sensor.find("number", namespaces).text
-        name = f"E{number}" if name is None else name
-        name = "E257" if name == "VREF" else name
-        x = sensor.find("x", namespaces).text
-        y = sensor.find("y", namespaces).text
-        z = sensor.find("z", namespaces).text
-        ch_pos[name] = np.array([float(x), float(y), float(z)])
-    nasion = ch_pos["Nasion"]
-    lpa = ch_pos["Left periauricular point"]
-    rpa = ch_pos["Right periauricular point"]
-    del ch_pos["Nasion"]
-    del ch_pos["Left periauricular point"]
-    del ch_pos["Right periauricular point"]
-    montage = make_dig_montage(ch_pos, nasion, lpa, rpa, coord_frame="unknown")
     # set montage
-    raw.set_montage(montage)
+    raw.rename_channels({"E257": "Cz"})
+    raw.set_montage("GSN-HydroCel-257")
+    raw.rename_channels({"Cz": "E257"})
 
     return raw
