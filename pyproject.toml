@@ -38,7 +38,7 @@ classifiers = [
 dependencies = [
     'numpy',
     'bsl==0.5.0',
-    'mne',
+    'mne==1.2.3',
     'pyxdf',
     'matplotlib',
 ]
